@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Vocabulary of U.S. Presidents</title>
+    
+    <style>
+        #floater {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            visibility: hidden;
+            font-size: 14px;
+            background-color: beige;
+            padding: 10x;
+            box-shadow: 3px 3px 3px #cccccc;
+            border-radius: 3px;
+        }
+        #svg-aligner {
+            float:left;
+            width:850px;
+        }
+        #col2{
+            width:450px;
+            height:400px;
+            float:right;
+        }
+        .key_insight_text{
+            text-anchor: start;
+            font-family: roboto:100;
+            fill: black;
+        }
+        .annotation_line{
+            stroke-width: 1;
+            stroke-opacity: .3;
+            stroke: black;
+        }
+        /*#connector1 {
+            stroke-width: 2px;
+            stroke: black;
+            visibility: hidden;
+            fill-opacity: .3;
+        }
+        #connector2 {
+            stroke-width: 2px;
+            stroke: black;
+            visibility: hidden;
+            fill-opacity: .3;
+        }*/
+    </style>
+    
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type = "text/javascript">
+        var yScaleFactor = 20;
+        
+        function getData(){
+            d3.csv('President_database1.csv', function(d){
+                data=d;
+                draw();
+                president();
+            })
+        }
+        
+        function draw(){
+            var starting_year =  1760;
+            var radiusscaleFactor = 450;
+            var yearxshift = 3;
+            var links = ['http://cdn.history.com/sites/2/2013/11/George_Washington-B.jpeg','http://cdn.history.com/sites/2/2013/11/John_Adams-B.jpeg','http://cdn.history.com/sites/2/2013/11/Thomas_Jefferson-B.jpeg','http://cdn.history.com/sites/2/2013/11/James_Madison-B.jpeg','http://cdn.history.com/sites/2/2013/11/James_Monroe-B.jpeg','http://cdn.history.com/sites/2/2013/11/John_Quincy_Adams-B.jpeg','http://cdn.history.com/sites/2/2013/11/Andrew_Jackson-B.jpeg','http://cdn.history.com/sites/2/2013/11/Martin_Van_Buren-B.jpeg','http://cdn.history.com/sites/2/2013/11/William_Henry_Harrison-B.jpeg','http://cdn.history.com/sites/2/2013/11/John_Tyler-B.jpeg','http://cdn.history.com/sites/2/2013/11/James_K_Polk-B.jpeg','http://cdn.history.com/sites/2/2013/11/Zachary_Taylor-B.jpeg','http://cdn.history.com/sites/2/2013/11/Millard_Fillmore-B.jpeg','http://cdn.history.com/sites/2/2013/11/Franklin_Pierce-B.jpeg','http://cdn.history.com/sites/2/2013/11/James_Buchanan-B.jpeg','http://cdn.history.com/sites/2/2013/11/Abraham_Lincoln_Hero_Chair-B.jpeg','http://cdn.history.com/sites/2/2013/11/Andrew_Johnson-B.jpeg','http://cdn.history.com/sites/2/2013/11/lithograph-ulysses-grant-B.jpeg','http://cdn.history.com/sites/2/2013/11/Rutherford_B_Hayes-B.jpeg','http://cdn.history.com/sites/2/2013/11/James_A_Garfield-B.jpeg','http://cdn.history.com/sites/2/2013/11/Chester_A_Arthur-B.jpeg','http://cdn.history.com/sites/2/2013/11/Grover_Cleveland-B.jpeg','http://cdn.history.com/sites/2/2013/11/Benjamin_Harrison-B.jpeg','http://cdn.history.com/sites/2/2013/11/William_McKinley-B.jpeg','http://cdn.history.com/sites/2/2013/11/Theodore_Roosevelt-B.jpeg','http://cdn.history.com/sites/2/2013/11/William_Howard_Taft-B.jpeg','http://cdn.history.com/sites/2/2013/11/Woodrow_Wilson-B.jpeg','http://cdn.history.com/sites/2/2013/11/Warren_G_Harding-B.jpeg','http://cdn.history.com/sites/2/2013/11/Calvin_Coolidge-B.jpeg','http://cdn.history.com/sites/2/2013/11/Herbert_Hoover-B.jpeg','http://cdn.history.com/sites/2/2013/11/Franklin_Delano_Roosevelt-B.jpeg','http://cdn.history.com/sites/2/2013/11/Harry_Truman-B.jpeg','http://cdn.history.com/sites/2/2013/11/Dwight_D_Eisenhower-B.jpeg','http://cdn.history.com/sites/2/2013/11/John_F_Kennedy-B.jpeg','http://cdn.history.com/sites/2/2013/11/Lyndon_B_Johnson-B.jpeg','http://cdn.history.com/sites/2/2013/11/Richard_Nixon-B.jpeg','http://cdn.history.com/sites/2/2013/11/Gerald_Ford-B.jpeg','http://cdn.history.com/sites/2/2013/11/Jimmy_Carter-B.jpeg','http://cdn.history.com/sites/2/2013/11/Ronald_Reagan-B.jpeg','http://cdn.history.com/sites/2/2013/11/George_Herbert_Walker_Bush-B.jpeg','http://cdn.history.com/sites/2/2013/11/Bill_Clinton-B.jpeg','http://cdn.history.com/sites/2/2014/02/president-george-w-bush-B.jpeg','http://cdn.history.com/sites/2/2013/11/Barack_Obama-B.jpeg']
+            
+//Graphics svg
+            var target = d3.select("#Graphics");
+            /*target.append("rect")
+                .attr("width", 20)
+                .attr("height", 700)
+                .attr("x", "400")
+                .attr("y", 10)
+                .attr("fill", "red")
+                .attr("fill-opacity",.2);*/
+            
+            target.selectAll(".speeches")
+                .data(data)
+                .enter().append("circle")
+                .attr("cx", function(d,i){
+                    return (+d['Starting Year']-starting_year)*yearxshift;
+                    })
+                .attr("cy", function(d,i){
+                    return  580- +d['Total Unique Words']/yScaleFactor;
+                    })
+                .attr("r", function(d,i){
+                    return +d['Total Words']/ (+d['Number of Speeches']*radiusscaleFactor);
+                    })
+                .attr("id", function(d,i){
+                    return d['President Name'].replace(/ /g,"_");
+                    })
+                .attr("fill-opacity", 0.6) 
+                .attr("fill", function(d,i){
+                    return d['Color'];
+                    })
+                .on("mouseover", function(d,i){
+                    d3.selectAll("circle")
+                    .each(function(d,j){
+                        if( j != i){
+                            d3.select(this).attr("fill-opacity", 0.2);
+                            }
+                        });
+                
+                    d3.select("#image")
+                    .attr("src", links[i])
+                    .attr("width", 70)
+                    .attr("height", 100);
+                
+                    d3.select("#Pred_Name").text(d[i,'President Name']);
+                    d3.select("#Years").text(d[i,'Year']);
+                    d3.select("#Num_Speeches").text(+d[i, 'Number of Speeches']);
+                    d3.select("#Tot_Words").text(+d[i, 'Total Words']);
+                
+                    d3.select("#floater")
+                    //.style("top",circle.attr("cy") + "px")
+                    //.style("left",circle.attr("cx") + "px")
+                    .style("top", d3.event.pageY + "px")
+                    .style("left", d3.event.pageX + "px")
+                    .style("visibility","visible");
+                
+                    /*d3.select("#connector1")
+                    .attr("x1",180)
+                    .attr("x2",d3.event.pageX + "px")
+                    .attr("y1",80)
+                    .attr("y2",80)
+                    .attr('visibility','visible')
+                    .style("stroke-dasharray", ("3,3"));
+                    
+                    d3.select("#connector2")
+                    .attr("x1",d3.event.pageX + "px")
+                    .attr("x2",d3.event.pageX + "px")
+                    .attr("y1",0)
+                    .attr('visibility','visible')
+                    .attr("y2",d3.event.pageY + "px")
+                    .style("stroke-dasharray", ("3,3"));*/
+                    })
+                
+                .on("mouseout", function(d,i){
+                    d3.selectAll("circle")
+                    .each(function(d,j){
+                        if(j != i){
+                            d3.select(this)
+                            .attr("fill-opacity",0.6);
+                            }
+                        });
+                    d3.select('#floater')
+                    .style('visibility','hidden');
+                    /*d3.select('#connector1')
+                    .style('visibility','hidden');
+                    d3.select('#connector2')
+                    .style('visibility','hidden');*/
+                    });
+//axes            
+            target.append("line")
+                .attr("x1", 30).attr("y1", 560)
+                .attr("x2", 850).attr("y2", 560)
+                .attr("stroke-width",1)
+                .attr("stroke", "black");
+
+            target.append("line")
+                .attr("x1", 30).attr("y1", 10)
+                .attr("x2", 30).attr("y2", 560)
+                .attr("stroke-width",1)
+                .attr("stroke", "black");
+//X-ticks            
+            target.selectAll(".ticktext")
+                .data(data).enter()
+                .append("text")
+                .text(function(d,i){
+                     if(d['ticks'] == "" ){
+                        return "";
+                    }
+                    else{
+                        return +d['ticks'];
+                    }
+                })
+                .attr("x", function(d){
+                    if(d['ticks'] == "" ){
+                        return "";
+                    }
+                    else{
+                        return +d['position'];
+                    }
+                })
+                .attr("y", 570)
+                .attr("fill", "black")
+                .attr("font-size", 11)
+                .attr("text-weight","bold")
+                .attr("text-anchor", "center");
+            
+            target.selectAll(".tickmarks")
+                .data(data).enter()
+                .append("line")
+                .attr("x1", function(d,i){
+                    if(d['ticks'] == "" ){
+                        return "";
+                    }
+                    else{
+                        return +d['position']+8;
+                    }
+                })
+                .attr("x2", function(d,i){
+                  if(d['ticks'] == "" ){
+                        return "";
+                    }
+                    else{
+                        return +d['position']+8;
+                    }
+                })
+                .attr("y1", 557)
+                .attr("y2", 562)
+                .attr("stroke-width", 2)
+                .attr("stroke", "black");
+            
+            target.append("text")
+                .text("Years")
+                .attr("x", 400)
+                .attr("y", 590)
+                .attr("text-anchor", "start")
+                .attr("text-weight", "bold")
+                .attr("font-size", 12)
+                .attr("fill", "black");
+            
+//Y-ticks
+            target.append("text")
+                .text("Total Vocabulary")
+                .attr("x", 5)
+                .attr("y", 250)
+                .attr("id", "y_text")
+                .attr("text-anchor", "start")
+                .attr("text-weight", "bold")
+                .attr("font-size", 12)
+                .attr("fill", "black")
+                .attr("writing-mode", "tb");
+            
+             target.selectAll(".yticktext")
+                .data(data).enter()
+                .append("text")
+                .attr("id", "yticks")
+                .text(function(d,i){
+                    if(d['ticks'] == ""){
+                        return "";
+                    }
+                    else{
+                        return +d['y_ticks'];
+                    }
+                })
+                .attr("y", function(d,i){
+                    if(d['ticks'] == ""){
+                        return "";
+                    }
+                    else{
+                        return +d['y_position'];
+                    }
+                })
+                .attr("x", 5)
+                .attr("fill", "black")
+                .attr("font-size", 11)
+                .attr("text-weight","bold")
+                .attr("text-anchor", "center");
+            
+// 1st Annotation in the graph            
+            target.append("line")
+                .attr("class","annotation_line")
+                .attr("x1", 170).attr("y1", 65)
+                .attr("x2", 170).attr("y2", 555)
+                .style("stroke-dasharray", ("3,3"));
+            
+             target.append("text")
+                 .text("2nd December 1823")
+                 .attr("x",150).attr("y", 35)
+                 .attr("text-anchor", "start")
+                 .attr("text-weight","bold")
+                 .attr("font-family", "roboto:100")
+                 .attr("fill", "black")
+                 .attr("font-size", 14);
+             
+             target.append("text")
+                 .text("Monroe addressed Congress in 1823 with")
+                 .attr("x",150).attr("y", 45)
+                 .attr("text-anchor", "start")
+                 .attr("font-family", "roboto:100")
+                 .attr("fill", "black")
+                 .attr("fill-opacity", .7)
+                 .attr("font-size", 11);
+            
+            target.append("text")
+                .text("what became known as his Monroe Doctrine")
+                .attr("x",150).attr("y", 55)
+                .attr("text-anchor", "start")
+                .attr("font-family", "roboto:100")
+                .attr("fill", "black")
+                .attr("fill-opacity", .7)
+                .attr("font-size", 11);
+
+//2nd Annotation
+            target.append("line")
+                .attr("class","annotation_line")
+                .attr("x1", 422).attr("y1", 50)
+                .attr("x2", 422).attr("y2", 555)
+                .style("stroke-dasharray", ("3,3"));
+
+             target.append("text")
+                .text("2nd September 1902")
+                .attr("x",400).attr("y", 25)
+                .attr("text-anchor", "start")
+                .attr("text-weight","bold")
+                .attr("font-family", "roboto:100")
+                .attr("fill", "black")
+                .attr("font-size", 14);
+             
+             target.append("text")
+                .text("Theodore Roosevelt, youngest presidet yet")
+                .attr("x",400).attr("y", 35)
+                .attr("text-anchor", "start")
+                .attr("font-family", "roboto:100")
+                .attr("fill", "black")
+                .attr("fill-opacity", .7)
+                .attr("font-size", 11);
+
+            target.append("text")
+                .text("talks of the need to 'Talk softly and carry a big stick'")
+                .attr("x",400).attr("y", 45)
+                .attr("text-anchor", "start")
+                .attr("font-family", "roboto:100")
+                .attr("fill", "black")
+                .attr("fill-opacity", .7)
+                .attr("font-size", 11);
+            
+//3rd Annotation
+            target.append("line")
+                .attr("class","annotation_line")
+                .attr("x1", 460).attr("y1", 90)
+                .attr("x2", 460).attr("y2", 555)
+                .style("stroke-dasharray", ("3,3"));
+            
+             target.append("text")
+                .text("2nd December 1913")
+                .attr("x",450).attr("y", 65)
+                .attr("text-anchor", "start")
+                .attr("text-weight","bold")
+                .attr("font-family", "roboto:100")
+                .attr("fill", "black")
+                .attr("font-size", 14);
+             
+             target.append("text")
+                .text("Woodrow Wilson delivers speech at state of union")
+                .attr("x",450).attr("y", 75)
+                .attr("text-anchor", "start")
+                .attr("font-family", "roboto:100")
+                .attr("fill", "black")
+                .attr("fill-opacity", .7)
+                .attr("font-size", 11);
+
+            target.append("text")
+                .text("ending 100 years of addresses being delivered in written message")
+                .attr("x",450).attr("y", 85)
+                .attr("text-anchor", "start")
+                .attr("font-family", "roboto:100")
+                .attr("fill", "black")
+                .attr("fill-opacity", .7)
+                .attr("font-size", 11);
+            
+//4th Annotation
+            target.append("line")
+                .attr("class","annotation_line")
+                .attr("x1", 510).attr("y1", 140)
+                .attr("x2", 510).attr("y2", 555)
+                .style("stroke-dasharray", ("3,3"));
+            
+             target.append("text")
+                .text("3rd January 1934")
+                .attr("x", 510).attr("y", 110)
+                .attr("text-anchor", "start")
+                .attr("text-weight","bold")
+                .attr("font-family", "roboto:100")
+                .attr("fill", "black")
+                .attr("font-size", 14);
+             
+             target.append("text")
+                .text("Frankalin D Roosevelt changes the name of annual address to congress")
+                .attr("x", 510).attr("y", 120)
+                .attr("text-anchor", "start")
+                .attr("font-family", "roboto:100")
+                .attr("fill", "black")
+                .attr("fill-opacity", .7)
+                .attr("font-size", 11);
+
+            target.append("text")
+                .text("from President's Annual Message to congress to State of the Union")
+                .attr("x", 510).attr("y", 130)
+                .attr("text-anchor", "start")
+                .attr("font-family", "roboto:100")
+                .attr("fill", "black")
+                .attr("fill-opacity", .7)
+                .attr("font-size", 11);
+            
+//key highlights
+//William Taft
+            target.append("text")
+                .text("President William Taft had the longest speeches")
+                .attr("class", "key_insight_text")
+                .attr("id","key_insight1")
+                .attr("x", 560).attr("y", 160)
+                .attr("text-weight", "bold")
+                .attr("font-size", 11);
+            
+            target.append("line")
+                .attr("x1", 558).attr("y1",165)
+                .attr("x2", 461).attr("y2", 319)
+                .attr("id", "line1")
+                .attr("stroke-width",1)
+                .style("stroke-dasharray", ("3,3"))
+                .attr("stroke-opacity", .7)
+                .attr("stroke", "black");
+            
+//Ronald Regan
+            target.append("text")
+                .text("President Ronald Regan had the largest vocabulary")
+                .attr("class", "key_insight_text")
+                .attr("id","key_insight2")
+                .attr("x", 560).attr("y", 180)
+                .attr("text-weight", "bold")
+                .attr("font-size", 11);
+
+            target.append("line")
+                .attr("x1", 661).attr("y1",190)
+                .attr("x2", 661).attr("y2", 232)
+                .attr("id", "line2")
+                .attr("stroke-width",1)
+                .style("stroke-dasharray", ("3,3"))
+                .attr("stroke-opacity", .7)
+                .attr("stroke", "black");
+
+//Lyndon Jhonson
+            target.append("text")
+                .text("President Lyndon Jhonson had the least diversed vocabulary per speech")
+                .attr("class", "key_insight_text")
+                .attr("id","key_insight3")
+                .attr("x", 145).attr("y", 530)
+                .attr("text-weight", "bold")
+                .attr("visibility", "hidden")
+                .attr("font-size", 11);
+            
+            target.append("line")
+                .attr("x1", 450).attr("y1",527)
+                .attr("x2", 599).attr("y2", 501)
+                .attr("id", "line3")
+                .attr("stroke-width",1)
+                .style("stroke-dasharray", ("3,3"))
+                .attr("stroke-opacity", .7)
+                .attr("stroke", "black")
+                .attr("visibility","hidden");
+            
+//millard Filmore            
+            target.append("text")
+                .text("President Millard Filmore had the most diversed vocabulary per speech")
+                .attr("class", "key_insight_text")
+                .attr("id","key_insight4")
+                .attr("x", 45).attr("y", 100)
+                .attr("text-weight", "bold")
+                .attr("visibility", "hidden")
+                .attr("font-size", 11);
+            
+            target.append("line")
+                .attr("x1", 220).attr("y1",105)
+                .attr("x2", 260).attr("y2", 135)
+                .attr("id", "line4")
+                .attr("stroke-width",1)
+                .style("stroke-dasharray", ("3,3"))
+                .attr("stroke-opacity", .5)
+                .attr("stroke", "black")
+                .attr("visibility","hidden");
+            
+//Warren Harding            
+            target.append("text")
+                .text("14th June 1922")
+                .attr("x", 560).attr("y", 300)
+                .attr("id", "key_insight6")
+                .attr("text-anchor", "start")
+                .attr("text-weight","bold")
+                .attr("font-family", "roboto:100")
+                .attr("fill", "black")
+                .attr("visibility", "hidden")
+                .attr("font-size", 14);
+            
+            target.append("text")
+                .text("President Warren Harding becomes the first")
+                .attr("id","key_insight5")
+                .attr("class", "key_insight_text")
+                .attr("x", 560).attr("y", 310)
+                .attr("visibility", "hidden")
+                .attr("fill-opacity", .7)
+                .attr("font-size", 11);
+            
+            target.append("text")
+                .text("President to be heard on Radio")
+                .attr("id","key_insight7")
+                .attr("class", "key_insight_text")
+                .attr("x", 560).attr("y", 320)
+                .attr("visibility", "hidden")
+                .attr("fill-opacity", .7)
+                .attr("font-size", 11);
+            
+            target.append("line")
+                .attr("x1", 560).attr("y1",315)
+                .attr("x2", 471).attr("y2", 430)
+                .attr("id", "line5")
+                .attr("stroke-width",1)
+                .style("stroke-dasharray", ("3,3"))
+                .attr("stroke-opacity", .5)
+                .attr("stroke", "black")
+                .attr("visibility","hidden");
+            
+//Legend            
+            target.append("text")
+            .text("Total Number of words per speech")
+            .attr("x",680).attr("y", 493)
+            .attr("text-anchor", "start")
+            .attr("font-family", "roboto:100")
+            .attr("fill", "black")
+            .attr("fill-opacity", .7)
+            .attr("font-size", 11);
+            
+            target.append("circle")
+            .attr("cx", 790)
+            .attr("cy", 520)
+            .attr("r", 20)
+            .style("stroke-dasharray", ("10,3"))
+            .style("stroke", "black")
+            .attr("stroke-opacity", .6)
+            .style("fill", "none");
+            
+            target.append("circle")
+            .attr("cx", 790)
+            .attr("cy", 535)
+            .attr("r", 5)
+            .style("stroke-dasharray", ("10,3"))
+            .style("stroke", "black")
+            .attr("stroke-opacity", .6)
+            .style("fill", "none");
+            
+            target.append("text")
+            .text("3000")
+            .attr("x",745)
+            .attr("y", 520)
+            .attr("text-anchor", "start")
+            .attr("font-family", "roboto:100")
+            .attr("fill", "black")
+            .attr("fill-opacity", .7)
+            .attr("font-size", 11);
+            
+            target.append("text")
+            .text("300")
+            .attr("x",755)
+            .attr("y", 537)
+            .attr("text-anchor", "start")
+            .attr("font-family", "roboto:100")
+            .attr("fill", "black")
+            .attr("fill-opacity", .7)
+            .attr("font-size", 11);
+        }
+        
+        function president(){
+            d3.select("#President_name").selectAll("option")
+                .data(d3.map(data, function(d) {return d["President Name"];}).keys())
+                .enter().append("option")
+                .text(function(d) {return d;})
+                .attr("value",function(d) {return d;});
+        }
+        
+        function newvocab(){
+            d3.selectAll("circle").data(data).attr("cy",function(d){   
+                return (580 - (+d['Total Unique Words']/(+d['Number of Speeches']*1.1)));
+            });
+            d3.select("#y_text").text("Vocabulary per speech");
+            d3.select("#line1")
+                .attr("x1", 558).attr("y1",165)
+                .attr("x2", 461).attr("y2", 187);
+            d3.select("#key_insight2")
+                .attr("visibility", "hidden");
+            d3.select("#line2")
+                .attr("visibility", "hidden");
+            d3.select("#key_insight3")
+                .attr("visibility", "visible");
+            d3.select("#line3")
+                .attr("visibility", "visible");
+            d3.select("#key_insight4")
+                .attr("visibility", "visible");
+            d3.select("#line4")
+                .attr("visibility", "visible");
+            d3.select("#key_insight5")
+                .attr("visibility", "visible");
+            d3.select("#key_insight6")
+                .attr("visibility", "visible");
+            d3.select("#key_insight7")
+                .attr("visibility", "visible");
+            d3.select("#line5")
+                .attr("visibility", "visible");
+            /*d3.selectAll("#yticks")
+                .data(data).enter()
+                .text(function(d,i){
+                    if(d['ticks'] == ""){
+                        return "";
+                    }
+                    else{
+                        return +d['y_ticksnew'];
+                    }
+                });*/
+        }
+        
+        function vocab(){
+            d3.selectAll("circle").data(data).attr("cy",function(d){   
+                return (580 - +d['Total Unique Words']/yScaleFactor);
+            });
+            d3.select("#y_text").text("Total Vocabulary");
+            d3.select("#line1").attr("x1", 558).attr("y1",165)
+                .attr("x2", 461).attr("y2", 319);
+            d3.select("#key_insight2")
+                .attr("visibility", "visible");
+            d3.select("#line2")
+                .attr("visibility", "visible");
+            d3.select("#key_insight3")
+                .attr("visibility", "hidden");
+            d3.select("#line3")
+                .attr("visibility", "hidden");
+            d3.select("#key_insight4")
+                .attr("visibility", "hidden");
+            d3.select("#line4")
+                .attr("visibility", "hidden");
+            d3.select("#key_insight5")
+                .attr("visibility", "hidden");
+            d3.select("#line5")
+                .attr("visibility", "hidden");
+            d3.select("#key_insight6")
+                .attr("visibility", "hidden");
+            d3.select("#key_insight7")
+                .attr("visibility", "hidden");
+            
+        }
+        
+        function filter(key) {
+            dimAll();
+            var circles = d3.select("#"+key.replace(/ /g,"_"))
+                .style("fill-opacity",1);
+        //        .attr("r", "10");
+        }
+        
+        function filterrect(key){
+            dimAllrect();
+            var rectangle = d3.select("#"+key)
+                .style("opacity", 1);
+        }
+        
+        function dimAllrect(){
+            var rect = d3.selectAll("rect")
+                .style("opacity", 0.01);
+        }
+        
+        function dimAll() {
+            var circles = d3.selectAll("circle")
+                .style("fill-opacity",0.01);
+        }
+        
+        function showAll() {
+            var circles = d3.selectAll("circle")
+                .style("fill-opacity",0.6);
+        }
+    </script>
+       
+</head>
+<body onload="getData()">
+    
+    <!--<h3 style="position:relative; text-align: center;">Data Visualization Project</h3> -->
+        
+<!-- Heading -->
+    <div id="Heading" class="Heading Section" width="850" style="position:relative; background-color:#fff;">
+        <p class="Name" style="font-size:48px; font-weight: 600; text-align:center; letter-spacing: 1px;">THE LARGEST VOCABULARY <br>IN<br> U.S. PRESIDENTS</p>
+        <hr style="margin-left:400px;"width = "40%" align="center">
+        <p class="subheading" style="text-align:center; font-weight:1000;">"Presidents ranked by the unique words they use words used in their speeches"</p>
+    </div>
+
+<!--Scroll down controls -->
+    <div id="controls" style="background-color:#F5F9FA">
+        <p id="Type of Analysis">
+            <button onclick="vocab()">Total Vocabulary</button>
+            <button onclick="newvocab()">Vocabulary per speech</button>
+        </p>
+        <p>
+            <strong>President Name</strong>: <select id="President_name" onChange="filter(this.value)"></select>
+            <button onclick="showAll()">Show All</button>
+            <button onclick="dimAll()">Dim All</button>
+        </p>
+    </div>
+
+<!--Graphics-->
+    <div id="container">
+        <div id="svg-aligner">
+            <svg id="Graphics" width="100%" height='600' style="background-color: #F5F9FA;">
+        <!--    <line id="connector1"></line>
+            <line id="connector2"></line>    -->
+            </svg>
+        </div>    
+<!-- Text -->
+        <div id="col2" style="background-color:#F5F9FA; text-align: left; padding:16px 16px 16px 0px;">
+            <div style="text-indent:50px">
+                <p> United States has a rich Literary history, Its presidents have been known to deliver famous and inspiring speechs through out its history.</p>
+                <p> So, it will be interesting to compare the size of vocabulary used by different presidents thorughout history. Here the vocabulary used by all presidents of US in their respective public speeches. The data is taken from <a href="http://millercenter.org/president/speeches">miller center</a>, which hosts 894 speeches from different presidents of united states. Also, the data lacks all speeches by a president, as only some key speeches are taken into account. It is also important to note the number of speeches taken into account for the analysis for each president.</p>
+            </div> 
+        </div>
+        
+<!--Author Name -->   
+        <div id="authorname" style="background-color:#fff; padding: 20px 0px 0px 0px;">
+                <p style="font-weight: 400; font-size: 15px; letter-spacing:2px; text-align: center;">By:- Prateek Agrawal</p>
+        </div>
+    </div>   
+
+<!--Floater on the graphics-->
+    <div id="floater">
+            <img id="image"/>
+            <span id="Pred_Name" style="font-weight: bold"></span><br />
+            years of Presidency:
+            <span id="Years"></span><br />
+            Speeches:
+            <span id="Num_Speeches"></span><br />
+            Total Number of Words:
+            <span id="Tot_Words"></span>
+    </div>
+    
+</body>
+</html>
